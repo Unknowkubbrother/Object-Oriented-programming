@@ -79,7 +79,7 @@ public class AccountTest {
         account1.withdraw(2500);
         account1.deposit(3000);
         System.out.println("Balance: " + account1.getBalance());
-        System.out.println("Rate: " + account1.getMonthlyInterestRate());
+        System.out.println("Rate: " + account1.getMonthlyInterest());
     
     }
     
