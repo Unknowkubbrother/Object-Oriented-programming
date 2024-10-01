@@ -11,6 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import java.awt.Rectangle;
 
 
 public class AngryBirds extends JFrame implements ActionListener{
@@ -74,8 +75,10 @@ public class AngryBirds extends JFrame implements ActionListener{
         Image imgBg = new ImageIcon(getClass().getResource("tokyothings.jpeg")).getImage();
         Image imgBird = new ImageIcon(getClass().getResource("bird.png")).getImage();
         Image imgPig = new ImageIcon(getClass().getResource("pig.png")).getImage();
-        Image yc = new ImageIcon(getClass().getResource("yellowcircle.png")).getImage();;
+        Image yc = new ImageIcon(getClass().getResource("yellowcircle.png")).getImage();
         int y=250,speed=0,dregge=0;
+        Rectangle imgPigBounds = new Rectangle(450, 100, 50, 50);
+        Rectangle ycBounds = new Rectangle((int)(100)+25, (int)(y-projectile(0,speed,dregge))+25, 10, 10);
         
 
         public DrawArea() {
@@ -91,14 +94,15 @@ public class AngryBirds extends JFrame implements ActionListener{
             double i=0;
             do{
                 g.drawImage(yc,(int)(100+i*speed)+25, (int)(y-projectile(i,speed,dregge))+25, 10, 10,this);
-                if((int)(100+i*speed)+25+5>=450&&(int)(100+i*speed)+25+5<=500&&(int)(y-projectile(i,speed,dregge))+25+5>=100&&(int)(y-projectile(i,speed,dregge))+25+5<=150){
+                ycBounds.setBounds((int)(100+i*speed)+25, (int)(y-projectile(i,speed,dregge))+25, 10, 10);
+                if (ycBounds.intersects(imgPigBounds)) {
                     jlbscore.setText("SCORE: 100");
                     break;
                 }else{
                     jlbscore.setText("SCORE: ");
                 }
-                i+=0.1;
-            }while(imgBird.getHeight(this)+projectile(i,speed,dregge)>0);
+                i+=0.5;
+            }while(getHeight() + projectile(i,speed,dregge) > 0);
         }
     }
     
