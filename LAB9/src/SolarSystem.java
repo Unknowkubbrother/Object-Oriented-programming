@@ -5,10 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 
-/**
- *
- * @author Rich
- */
 public class SolarSystem extends JFrame{
     Image bg = new ImageIcon(getClass().getResource("solarbg.jpg")).getImage();
     int x = 0;
