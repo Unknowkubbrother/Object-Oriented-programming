@@ -1,24 +1,23 @@
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.ResultSet;
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;;
 
 public class LAB9_No7 extends JFrame {
-    private static String url = "jdbc:mysql://localhost:3306/lab9_no7";
-    private static String user = "root";
-    private static String password = "";
     private static Statement sql;
     JPanel header = new JPanel();
     JPanel body = new JPanel();
     JPanel footer = new JPanel();
     Listener spyListener = new Listener();
-    String[] Days = { "01", "02" , "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" };
+    String[] Days = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16",
+            "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" };
     String[] Months = {
-            "01", "02" , "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"
+            "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"
     };
 
     // field
@@ -34,6 +33,7 @@ public class LAB9_No7 extends JFrame {
     JComboBox<String> inputBdMonth;
     JComboBox<String> inputBdYears;
     JTextField inputAge;
+    JTextField inputIdSearch;
 
     public LAB9_No7(String Title) {
         super(Title);
@@ -66,9 +66,13 @@ public class LAB9_No7 extends JFrame {
         setAction(save);
         JButton show = new JButton("SHOW");
         setAction(show);
-        save.setHorizontalAlignment(JButton.RIGHT);
-        show.setHorizontalAlignment(JButton.LEFT);
+        JButton update = new JButton("UPDATE");
+        setAction(update);
+        JButton delete = new JButton("DELETE");
+        setAction(delete);
         footerLayout.add(save);
+        footerLayout.add(update);
+        footerLayout.add(delete);
         footerLayout.add(show);
         footer.add(footerLayout, BorderLayout.EAST);
     };
@@ -216,30 +220,29 @@ public class LAB9_No7 extends JFrame {
 
             String cmd = e.getActionCommand();
             if (cmd.equals("SAVE")) {
-                if (inputId.getText().equals("") 
+                if (inputId.getText().equals("")
                         || inputMoney.getText().equals("")
                         || inputRate.getText().equals("")
                         || inputDateOpenAccountDay.getSelectedIndex() == 0
                         || inputDateOpenAccountMonth.getSelectedIndex() == 0
-                        || inputDateOpenAccountYears.getSelectedIndex() == 0 
+                        || inputDateOpenAccountYears.getSelectedIndex() == 0
                         || inputFirstName.getText().equals("")
-                        || inputLastName.getText().equals("") 
+                        || inputLastName.getText().equals("")
                         || inputBdDay.getSelectedIndex() == 0
-                        || inputBdMonth.getSelectedIndex() == 0 
+                        || inputBdMonth.getSelectedIndex() == 0
                         || inputBdYears.getSelectedIndex() == 0
                         || inputAge.getText().equals("")) {
-                    JOptionPane.showMessageDialog(null, "Please fill in all the information", "Warning",
-                    JOptionPane.WARNING_MESSAGE);
-                }else{
+                    ShowWarning("Please fill in all the information");
+                } else {
                     String checkTable = "SELECT * FROM accounts_money";
-                    try{
+                    try {
                         sql.executeQuery(checkTable);
-                    }catch(Exception ex){
+                    } catch (Exception ex) {
                         String createTable = "CREATE TABLE accounts_money (id INT PRIMARY KEY, money DOUBLE, rate DOUBLE, date_open_account DATE, first_name VARCHAR(255), last_name VARCHAR(255), bd DATE, age INT)";
-                        try{
+                        try {
                             sql.executeUpdate(createTable);
-                        }catch(Exception e1){
-                            JOptionPane.showMessageDialog(null, "Error", "Error", JOptionPane.ERROR_MESSAGE);
+                        } catch (Exception e1) {
+                            ShowError("Error");
                         }
                     }
                     try {
@@ -247,48 +250,147 @@ public class LAB9_No7 extends JFrame {
                         String money = inputMoney.getText();
                         String rate = inputRate.getText();
                         String dateOpenAccount = inputDateOpenAccountYears.getSelectedItem() + "-"
-                                + inputDateOpenAccountMonth.getSelectedItem() + "-" + inputDateOpenAccountDay.getSelectedItem();
+                                + inputDateOpenAccountMonth.getSelectedItem() + "-"
+                                + inputDateOpenAccountDay.getSelectedItem();
                         String firstName = inputFirstName.getText();
                         String lastName = inputLastName.getText();
                         String bd = inputBdYears.getSelectedItem() + "-" + inputBdMonth.getSelectedItem() + "-"
                                 + inputBdDay.getSelectedItem();
                         String age = inputAge.getText();
                         String sqlInsert = "INSERT INTO accounts_money (id, money, rate, date_open_account, first_name, last_name, bd, age) VALUES ('"
-                                + Integer.parseInt(id) + "', '" + Double.parseDouble(money) + "', '" + Double.parseDouble(rate) + "', '" + dateOpenAccount + "', '" + firstName
+                                + Integer.parseInt(id) + "', '" + Double.parseDouble(money) + "', '"
+                                + Double.parseDouble(rate) + "', '" + dateOpenAccount + "', '" + firstName
                                 + "', '" + lastName + "', '" + bd + "', '" + Integer.parseInt(age) + "')";
                         sql.executeUpdate(sqlInsert);
                         JOptionPane.showMessageDialog(null, "Save data successfully", "Success",
                                 JOptionPane.INFORMATION_MESSAGE);
                     } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(null, "Error", "Error", JOptionPane.ERROR_MESSAGE);
-                    }   
-                }
-
-            }else if ((cmd.equals("SHOW"))){
-                if(inputId.getText().equals("")){
-                    JOptionPane.showMessageDialog(null, "Please fill in ID", "Warning", JOptionPane.WARNING_MESSAGE);
-                }else{
-                    try{
-                        String query = "SELECT * FROM accounts_money WHERE id = " + Integer.parseInt(inputId.getText());
-                        ResultSet rs = sql.executeQuery(query);
-                        String text = "";
-                        while (rs.next()) {
-                            String firtname = rs.getString("first_name");
-                            String lastname = rs.getString("last_name");
-                            double money = rs.getDouble("money");
-                            text = "First Name : " + firtname + "\n" + "Last Name : " + lastname + "\n" + "Money : " + money;
-                        }
-                        if (text.equals("")) {
-                            JOptionPane.showMessageDialog(null, "Not found", "Warning", JOptionPane.WARNING_MESSAGE);
-                        } else {
-                            JOptionPane.showMessageDialog(null, text, "Show Details Account Money", JOptionPane.INFORMATION_MESSAGE);
-                        }
-                    }catch(Exception ex){
-                        JOptionPane.showMessageDialog(null, "Error", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Save data successfully", "Success",
+                                JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
+
+            } else if ((cmd.equals("SHOW"))) {
+
+                String idinput = showDialog();
+
+                try {
+                    if (!idinput.isEmpty()) {
+                        String sqlSelect = "SELECT * FROM accounts_money WHERE id = '" + Integer.parseInt(idinput)
+                                + "'";
+                        ResultSet result = sql.executeQuery(sqlSelect);
+                        if (result.next()) {
+                            String id = result.getString("id");
+                            String money = result.getString("money");
+                            String rate = result.getString("rate");
+                            String dateOpenAccount = result.getString("date_open_account");
+                            String firstName = result.getString("first_name");
+                            String lastName = result.getString("last_name");
+                            String bd = result.getString("bd");
+                            String age = result.getString("age");
+                            JOptionPane.showMessageDialog(null, "ID : " + id + "\nMONEY : " + money + "\nRATE : " + rate
+                                    + "\nDATE OPEN ACCOUNT : " + dateOpenAccount + "\nFIRST NAME : " + firstName
+                                    + "\nLAST NAME : " + lastName + "\nBIRTHDAY : " + bd + "\nAGE : " + age, "Details",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    }
+
+                } catch (Exception ex) {
+                    ShowError("Error");
+                }
+
+            } else if (cmd.equals("UPDATE")) {
+
+                String idinput = showDialog();
+
+                if (!idinput.isEmpty()) {
+                    try {
+                        if (inputId.getText().equals("")
+                                || inputMoney.getText().equals("")
+                                || inputRate.getText().equals("")
+                                || inputDateOpenAccountDay.getSelectedIndex() == 0
+                                || inputDateOpenAccountMonth.getSelectedIndex() == 0
+                                || inputDateOpenAccountYears.getSelectedIndex() == 0
+                                || inputFirstName.getText().equals("")
+                                || inputLastName.getText().equals("")
+                                || inputBdDay.getSelectedIndex() == 0
+                                || inputBdMonth.getSelectedIndex() == 0
+                                || inputBdYears.getSelectedIndex() == 0
+                                || inputAge.getText().equals("")) {
+                            ShowWarning("Please fill in all the information");
+                        } else {
+                            String id = inputId.getText();
+                            String money = inputMoney.getText();
+                            String rate = inputRate.getText();
+                            String dateOpenAccount = inputDateOpenAccountYears.getSelectedItem() + "-"
+                                    + inputDateOpenAccountMonth.getSelectedItem() + "-"
+                                    + inputDateOpenAccountDay.getSelectedItem();
+                            String firstName = inputFirstName.getText();
+                            String lastName = inputLastName.getText();
+                            String bd = inputBdYears.getSelectedItem() + "-" + inputBdMonth.getSelectedItem() + "-"
+                                    + inputBdDay.getSelectedItem();
+                            String age = inputAge.getText();
+                            String sqlInsert = "UPDATE accounts_money SET id = " + Integer.parseInt(id) + ", money = "
+                                    + Double.parseDouble(money) + ", rate = " + Double.parseDouble(rate)
+                                    + ", date_open_account = '" + dateOpenAccount + "', first_name = '" + firstName
+                                    + "', last_name = '" + lastName + "', bd = '" + bd + "', age = "
+                                    + Integer.parseInt(age)
+                                    + " WHERE id = " + Integer.parseInt(idinput);
+                            sql.executeUpdate(sqlInsert);
+                            JOptionPane.showMessageDialog(null, "Update data successfully", "Success",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    } catch (Exception ex) {
+                        ShowError("Error");
+                    }
+                }
+
+            } else if (cmd.equals("DELETE")) {
+
+                String idinput = showDialog();
+
+                if (!idinput.isEmpty()) {
+                    try {
+                        String sqlDelete = "DELETE FROM accounts_money WHERE id = '" + Integer.parseInt(idinput) + "'";
+                        sql.executeUpdate(sqlDelete);
+                        JOptionPane.showMessageDialog(null, "Delete data successfully", "Success",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    } catch (Exception ex) {
+                        ShowError("Error");
+                    }
+                }
+
             }
         }
+    }
+
+    String showDialog() {
+        String input = JOptionPane.showInputDialog(null, "Input ID : ",
+                "INPUT", JOptionPane.INFORMATION_MESSAGE);
+        if (input.isEmpty()) {
+            ShowWarning("Please fill in all the information");
+            return "";
+        }
+        String check = "SELECT id FROM accounts_money WHERE id = '" + Integer.parseInt(input) + "'";
+        try {
+            ResultSet result = sql.executeQuery(check);
+            if (!result.next()) {
+                ShowWarning("ID not found");
+                return "";
+            }
+            return input;
+        } catch (Exception ex) {
+            ShowError("Error");
+        }
+        return "";
+    }
+
+    void ShowError(String text) {
+        JOptionPane.showMessageDialog(null, text, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    void ShowWarning(String text) {
+        JOptionPane.showMessageDialog(null, text, "Warning", JOptionPane.WARNING_MESSAGE);
     }
 
     public static void main(String[] args) throws Exception {
@@ -296,6 +398,10 @@ public class LAB9_No7 extends JFrame {
         new LAB9_No7("Show Details Account Money");
 
         // Connect to the database
+
+        String url = "jdbc:mysql://localhost:3306/lab9_no7";
+        String user = "root";
+        String password = "";
 
         Class.forName("com.mysql.cj.jdbc.Driver");
 
@@ -306,6 +412,8 @@ public class LAB9_No7 extends JFrame {
         }
 
         sql = con.createStatement();
+
+        //
 
     }
 }
