@@ -14,7 +14,7 @@ import javax.swing.JTextField;
 import java.awt.Rectangle;
 
 
-public class AngryBirds extends JFrame implements ActionListener{
+public class Lab9_8 extends JFrame implements ActionListener{
     
     JPanel head = new JPanel(new GridLayout(1, 2));
     JPanel data = new JPanel(new GridLayout(3, 3));
@@ -30,7 +30,7 @@ public class AngryBirds extends JFrame implements ActionListener{
     JButton jbtsubmit = new JButton("OK");
     
     DrawArea draw = new DrawArea();
-    public AngryBirds() {
+    public Lab9_8() {
         head.add(new JLabel("SCENE 1: At Tokyo"));
         head.add(jlbscore);
         addData();
@@ -107,7 +107,7 @@ public class AngryBirds extends JFrame implements ActionListener{
     }
     
     public static void main(String[] args) {
-        AngryBirds j = new AngryBirds();
+        Lab9_8 j = new Lab9_8();
         j.setTitle("AbgryBirds");
         j.setSize(600,500);
         j.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
